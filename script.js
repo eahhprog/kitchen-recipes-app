@@ -1,4 +1,4 @@
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwMP_UeBzoWLs_1tueD8PfJ5FWDzIUbDqXxU_WYH38qLqDLbNWCI0GPqGSQqQbuosQq/exec'; // Твой URL из Apps Script
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzUknm8JaxAgQrZlxVwXaewN98OxFrNjveVFZv674sCMy41ufQBewSPt6F8loZhHfcM/exec'; // Твой URL из Apps Script
 const TG = window.Telegram.WebApp;
 TG.expand();
 
