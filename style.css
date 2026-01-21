@@ -1,5 +1,6 @@
-/* style.css - Красивый дизайн для кухонного приложения */
+/* style.css - Полный стиль для приложения "Кухонные Раскладки" */
 
+/* Общие стили */
 * {
   margin: 0;
   padding: 0;
@@ -15,7 +16,7 @@ body {
   line-height: 1.5;
 }
 
-/* Контейнеры */
+/* Основные контейнеры */
 #auth, #main {
   max-width: 600px;
   margin: 0 auto;
@@ -34,7 +35,7 @@ h2 {
 }
 
 /* Поля ввода */
-input, textarea {
+input, textarea, select {
   width: 100%;
   padding: 14px 16px;
   margin-bottom: 16px;
@@ -46,7 +47,7 @@ input, textarea {
   transition: border-color 0.3s;
 }
 
-input:focus, textarea:focus {
+input:focus, textarea:focus, select:focus {
   outline: none;
   border-color: #4CAF50;
   box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
@@ -62,7 +63,7 @@ button {
   width: 100%;
   padding: 14px;
   margin: 8px 0;
-  background: #4CAF50; /* Зелёный, как "свежее" на кухне */
+  background: #4CAF50; /* Зелёный, свежий */
   color: white;
   border: none;
   border-radius: 12px;
@@ -89,31 +90,48 @@ button:disabled {
   box-shadow: none;
 }
 
-/* Список рецептов */
-#recipes {
+/* Список раскладок */
+#raskladkiList {
   margin-top: 24px;
 }
 
-#recipes > div {
+.raskladka-item {
   background: #252525;
   padding: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   border-radius: 12px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   border-left: 4px solid #4CAF50;
 }
 
-#recipes > div button {
-  width: auto;
-  padding: 10px 16px;
-  font-size: 0.95rem;
-  background: #2196F3; /* Синий для редактирования */
+.raskladka-item strong {
+  font-size: 1.2rem;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 6px;
 }
 
-#recipes > div button:hover {
-  background: #1e88e5;
+.raskladka-item small {
+  color: #aaaaaa;
+  font-size: 0.9rem;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.raskladka-item details {
+  margin-top: 8px;
+}
+
+.raskladka-item summary {
+  cursor: pointer;
+  color: #4CAF50;
+  font-weight: bold;
+  padding: 6px 0;
+}
+
+.raskladka-item p {
+  margin-top: 8px;
+  white-space: pre-wrap;
+  color: #e0e0e0;
 }
 
 /* Форма добавления */
@@ -122,6 +140,19 @@ button:disabled {
   padding: 20px;
   background: #252525;
   border-radius: 12px;
+}
+
+/* Стили для кнопки редактирования */
+.raskladka-item button {
+  width: auto;
+  padding: 10px 16px;
+  font-size: 0.95rem;
+  margin-top: 12px;
+  background: #2196F3; /* Синий для редактирования */
+}
+
+.raskladka-item button:hover {
+  background: #1e88e5;
 }
 
 /* Адаптивность */
@@ -139,7 +170,7 @@ button:disabled {
   }
 }
 
-/* Лёгкая анимация появления */
+/* Анимация появления */
 #auth, #main {
   animation: fadeIn 0.5s ease-in-out;
 }
