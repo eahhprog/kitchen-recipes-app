@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Кухонные Рецепты</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script> <!-- TG API -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script> <!-- Для хэшей паролей -->
+  <script src="script.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="auth">
+    <h2>Авторизация</h2>
+    <input id="login" placeholder="Логин">
+    <input id="password" type="password" placeholder="Пароль">
+    <button onclick="login()">Войти</button>
+  </div>
+  <div id="main" style="display:none;">
+    <h2>Рецепты</h2>
+    <button onclick="showAddForm()">Добавить рецепт</button>
+    <div id="recipes"></div>
+    <div id="addForm" style="display:none;">
+      <input id="name" placeholder="Название">
+      <textarea id="ingredients" placeholder="Ингредиенты"></textarea>
+      <textarea id="layout" placeholder="Раскладки"></textarea>
+      <button onclick="addRecipe()">Сохранить</button>
+    </div>
+  </div>
+</body>
+</html>
