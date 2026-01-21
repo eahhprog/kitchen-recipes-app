@@ -8,31 +8,39 @@ let currentLogin = null;
 
 // Авторизация
 async function login() {
-  const login = document.getElementById('login').value.trim();
-  const password = document.getElementById('password').value;
-  const hashedPass = CryptoJS.SHA256(password).toString();
+  alert('Функция login() запустилась!');
 
-  const response = await fetch(`${SHEET_URL}?sheet=Users&action=read`);
-  const users = await response.json();
+  try {
+    const login = document.getElementById('login').value.trim();
+    const password = document.getElementById('password').value;
+    const hashedPass = CryptoJS.SHA256(password).toString();
 
-  for (let user of users.slice(1)) {
-    if (user[0] === login && user[1] === hashedPass) {
-      userRole = user[2];
-      currentLogin = login;
-      document.getElementById('auth').style.display = 'none';
-      document.getElementById('main').style.display = 'block';
+    console.log('Пытаемся авторизоваться:', login);
 
-      // Показываем кнопку добавления только для нужных ролей
-      if (['soushef', 'shef', 'admin'].includes(userRole)) {
-        document.getElementById('addButton').style.display = 'block';
+    const response = await fetch(`${SHEET_URL}?sheet=Users&action=read`);
+    console.log('Ответ от Google:', response);
+
+    const users = await response.json();
+    console.log('Пользователи загружены:', users);
+
+    for (let user of users.slice(1)) {
+      if (user[0] === login && user[1] === hashedPass) {
+        userRole = user[2];
+        currentLogin = login;
+        document.getElementById('auth').style.display = 'none';
+        document.getElementById('main').style.display = 'block';
+        if (['soushef', 'shef', 'admin'].includes(userRole)) {
+          document.getElementById('addButton').style.display = 'block';
+        }
+        loadRaskladki();
+        return;
       }
-
-      // Автоматически загружаем раскладки первого цеха после входа
-      loadRaskladki();
-      return;
     }
+    alert('Неверный логин или пароль');
+  } catch (error) {
+    console.error('Ошибка в login():', error);
+    alert('Ошибка: ' + error.message);
   }
-  alert('Неверный логин или пароль');
 }
 
 // Загрузка раскладок для выбранного цеха
