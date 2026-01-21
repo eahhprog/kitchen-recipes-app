@@ -1,6 +1,6 @@
-/* style.css - Полный стиль для приложения "Кухонные Раскладки" */
+/* style.css - Крутой и красивый дизайн для "Кухонные Раскладки" 2025 */
 
-/* Общие стили */
+/* Глобальные стили */
 * {
   margin: 0;
   padding: 0;
@@ -8,174 +8,174 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: #121212; /* Тёмный фон Telegram */
-  color: #e0e0e0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+  color: #e0e0ff;
   min-height: 100vh;
   padding: 16px;
-  line-height: 1.5;
+  overflow-x: hidden;
 }
 
-/* Основные контейнеры */
+/* Основной контейнер */
 #auth, #main {
-  max-width: 600px;
+  max-width: 640px;
   margin: 0 auto;
-  background: #1e1e1e;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  background: rgba(30, 30, 50, 0.85);
+  backdrop-filter: blur(12px);
+  border-radius: 24px;
+  padding: 32px 24px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), inset 0 0 20px rgba(100, 200, 255, 0.1);
+  border: 1px solid rgba(100, 200, 255, 0.15);
 }
 
 /* Заголовки */
 h2 {
   color: #ffffff;
-  margin-bottom: 20px;
-  font-size: 1.6rem;
+  font-size: 1.8rem;
+  font-weight: 700;
   text-align: center;
+  margin-bottom: 28px;
+  background: linear-gradient(90deg, #00d4ff, #7c4dff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 1px;
 }
 
-/* Поля ввода */
+/* Поля ввода и селект */
 input, textarea, select {
   width: 100%;
-  padding: 14px 16px;
-  margin-bottom: 16px;
-  border: 1px solid #333;
-  border-radius: 12px;
-  background: #2a2a2a;
+  padding: 16px 18px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(100, 200, 255, 0.3);
+  border-radius: 16px;
+  background: rgba(40, 40, 70, 0.6);
   color: #ffffff;
-  font-size: 1rem;
-  transition: border-color 0.3s;
+  font-size: 1.05rem;
+  transition: all 0.3s ease;
 }
 
 input:focus, textarea:focus, select:focus {
   outline: none;
-  border-color: #4CAF50;
-  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-}
-
-textarea {
-  min-height: 120px;
-  resize: vertical;
+  border-color: #00d4ff;
+  box-shadow: 0 0 0 4px rgba(0, 212, 255, 0.25);
+  background: rgba(40, 40, 70, 0.8);
 }
 
 /* Кнопки */
 button {
   width: 100%;
-  padding: 14px;
-  margin: 8px 0;
-  background: #4CAF50; /* Зелёный, свежий */
+  padding: 16px;
+  margin: 12px 0;
+  background: linear-gradient(90deg, #00d4ff, #7c4dff);
   color: white;
   border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
+  border-radius: 16px;
+  font-size: 1.15rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.4s ease;
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.4);
 }
 
 button:hover {
-  background: #43a047;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(76, 175, 80, 0.3);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 15px 35px rgba(0, 212, 255, 0.6);
 }
 
 button:active {
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
 }
 
-button:disabled {
-  background: #555;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-/* Список раскладок */
-#raskladkiList {
-  margin-top: 24px;
-}
-
+/* Список раскладок — карточки */
 .raskladka-item {
-  background: #252525;
-  padding: 16px;
-  margin-bottom: 16px;
-  border-radius: 12px;
-  border-left: 4px solid #4CAF50;
+  background: rgba(40, 40, 70, 0.7);
+  backdrop-filter: blur(8px);
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(100, 200, 255, 0.2);
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+.raskladka-item:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0, 212, 255, 0.3);
+  border-color: #00d4ff;
 }
 
 .raskladka-item strong {
-  font-size: 1.2rem;
-  color: #ffffff;
-  display: block;
-  margin-bottom: 6px;
-}
-
-.raskladka-item small {
-  color: #aaaaaa;
-  font-size: 0.9rem;
+  font-size: 1.35rem;
+  color: #00d4ff;
   display: block;
   margin-bottom: 8px;
 }
 
+.raskladka-item small {
+  color: #a0a0ff;
+  font-size: 0.95rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
 .raskladka-item details {
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
 .raskladka-item summary {
   cursor: pointer;
-  color: #4CAF50;
-  font-weight: bold;
-  padding: 6px 0;
+  color: #7c4dff;
+  font-weight: 600;
+  padding: 8px 0;
+  transition: color 0.3s;
+}
+
+.raskladka-item summary:hover {
+  color: #00d4ff;
 }
 
 .raskladka-item p {
-  margin-top: 8px;
+  margin-top: 10px;
   white-space: pre-wrap;
-  color: #e0e0e0;
+  color: #d0d0ff;
 }
 
 /* Форма добавления */
 #addForm {
-  margin-top: 24px;
-  padding: 20px;
-  background: #252525;
-  border-radius: 12px;
+  margin-top: 28px;
+  padding: 24px;
+  background: rgba(50, 50, 80, 0.6);
+  border-radius: 20px;
+  border: 1px solid rgba(124, 77, 255, 0.3);
 }
 
-/* Стили для кнопки редактирования */
+/* Кнопка редактирования */
 .raskladka-item button {
   width: auto;
-  padding: 10px 16px;
-  font-size: 0.95rem;
+  padding: 12px 20px;
+  font-size: 1rem;
   margin-top: 12px;
-  background: #2196F3; /* Синий для редактирования */
+  background: linear-gradient(90deg, #7c4dff, #00d4ff);
+  box-shadow: 0 6px 20px rgba(124, 77, 255, 0.4);
 }
 
 .raskladka-item button:hover {
-  background: #1e88e5;
+  box-shadow: 0 12px 30px rgba(124, 77, 255, 0.6);
 }
 
 /* Адаптивность */
 @media (max-width: 500px) {
-  body {
-    padding: 12px;
-  }
-  
-  #auth, #main {
-    padding: 20px;
-  }
-  
-  h2 {
-    font-size: 1.4rem;
-  }
+  body { padding: 12px; }
+  #auth, #main { padding: 24px 16px; }
+  h2 { font-size: 1.6rem; }
 }
 
-/* Анимация появления */
+/* Плавное появление */
 #auth, #main {
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeInUp 0.6s ease-out;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(40px); }
   to   { opacity: 1; transform: translateY(0); }
 }
