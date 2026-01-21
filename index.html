@@ -2,9 +2,9 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Кухонные Рецепты</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script> <!-- TG API -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script> <!-- Для хэшей паролей -->
+  <title>Кухонные Раскладки</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script src="script.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -16,14 +16,21 @@
     <button onclick="login()">Войти</button>
   </div>
   <div id="main" style="display:none;">
-    <h2>Рецепты</h2>
-    <button onclick="showAddForm()">Добавить рецепт</button>
-    <div id="recipes"></div>
+    <h2>Раскладки по цехам</h2>
+    <select id="workshop">
+      <option value="Raskladki_Goryachiy">Горячий цех</option>
+      <option value="Raskladki_Holodniy">Холодный цех</option>
+      <option value="Raskladki_Konditerskiy">Кондитерский цех</option>
+      <option value="Raskladki_Zagotovka">Заготовочный цех</option>
+      <!-- Добавляй новые цеха сюда по аналогии -->
+    </select>
+    <div id="raskladkiList"></div>
+    <button id="addButton" onclick="showAddForm()" style="display:none;">Добавить раскладку</button>
     <div id="addForm" style="display:none;">
-      <input id="name" placeholder="Название">
+      <input id="name" placeholder="Название блюда/заготовки">
       <textarea id="ingredients" placeholder="Ингредиенты"></textarea>
-      <textarea id="layout" placeholder="Раскладки"></textarea>
-      <button onclick="addRecipe()">Сохранить</button>
+      <textarea id="raskladki" placeholder="Раскладка (описание, шаги, нормы)"></textarea>
+      <button onclick="addRaskladka()">Сохранить</button>
     </div>
   </div>
 </body>
