@@ -1,7 +1,7 @@
 // script.js — Полная рабочая версия с исправлениями CORS, ошибок и addEventListener
 
 // Прокси + твой URL (обязательно замени на свой реальный!)
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxKaYqQevkl0ul_kdlwq3L7J2lyefoEez85A0nS_6oUVV-Pwvx9BlTv7yDT0KX0PoUO/exec';
+const SHEET_URL = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://script.google.com/macros/s/AKfycbxKaYqQevkl0ul_kdlwq3L7J2lyefoEez85A0nS_6oUVV-Pwvx9BlTv7yDT0KX0PoUO/exec');
 // ↑ Это твой URL — он правильный, но Google его блокирует без прокси
 
 const TG = window.Telegram.WebApp;
