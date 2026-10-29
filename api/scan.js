@@ -1,6 +1,4 @@
-// Файл: api/scan.js
 export default async function handler(req, res) {
-    // Разрешаем только POST-запросы
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Метод не разрешен' });
     }
@@ -10,7 +8,6 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Фото не передано' });
     }
 
-    // Берем ваш ключ из скрытых переменных окружения Vercel
     const apiKey = process.env.GEMINI_API_KEY; 
 
     if (!apiKey) {
@@ -18,6 +15,28 @@ export default async function handler(req, res) {
     }
 
     try {
+        // 1. АВТО-ОПРЕДЕЛЕНИЕ МОДЕЛИ У GOOGLE
+        const modelsReq = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        if (!modelsReq.ok) throw new Error("Не удалось получить список моделей от Google API");
+        
+        const modelsData = await modelsReq.json();
+        let selectedModel = "models/gemini-1.5-flash"; // Значение по умолчанию
+        
+        if (modelsData && modelsData.models) {
+            const validModels = modelsData.models.filter(m => 
+                m.supportedGenerationMethods && 
+                m.supportedGenerationMethods.includes('generateContent') && 
+                m.name.includes('flash')
+            );
+            if (validModels.length > 0) {
+                selectedModel = validModels[0].name;
+            } else {
+                const anyModel = modelsData.models.find(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'));
+                if (anyModel) selectedModel = anyModel.name;
+            }
+        }
+
+        // 2. ОТПРАВКА ФОТО В НАЙДЕННУЮ МОДЕЛЬ
         const payload = {
             contents: [{
                 parts: [
@@ -28,8 +47,7 @@ export default async function handler(req, res) {
             generationConfig: { responseMimeType: "application/json" }
         };
 
-        // Сервер Vercel делает запрос к Google
-        const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/${selectedModel}:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -43,11 +61,11 @@ export default async function handler(req, res) {
         const result = await googleRes.json();
         let textResponse = result.candidates[0].content.parts[0].text;
         
-        // Очищаем от Markdown, если нейросеть его добавила
+        // Очищаем от Markdown (```json ... ```)
         textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
         const aiData = JSON.parse(textResponse);
 
-        // Отправляем результат обратно в ваше приложение
+        // Отправляем результат обратно в интерфейс
         return res.status(200).json(aiData);
 
     } catch (error) {
