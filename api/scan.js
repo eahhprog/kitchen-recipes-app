@@ -26,8 +26,8 @@ export default async function handler(req, res) {
             generationConfig: { responseMimeType: "application/json" }
         };
 
-        // Используем самую быструю официальную модель 1.5-flash
-        const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        // ИСПРАВЛЕНО: Стучимся в gemini-3.8-flash
+        const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
