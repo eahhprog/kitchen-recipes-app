@@ -15,28 +15,6 @@ export default async function handler(req, res) {
     }
 
     try {
-        // 1. АВТО-ОПРЕДЕЛЕНИЕ МОДЕЛИ У GOOGLE
-        const modelsReq = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-        if (!modelsReq.ok) throw new Error("Не удалось получить список моделей от Google API");
-        
-        const modelsData = await modelsReq.json();
-        let selectedModel = "models/gemini-1.5-flash"; // Значение по умолчанию
-        
-        if (modelsData && modelsData.models) {
-            const validModels = modelsData.models.filter(m => 
-                m.supportedGenerationMethods && 
-                m.supportedGenerationMethods.includes('generateContent') && 
-                m.name.includes('flash')
-            );
-            if (validModels.length > 0) {
-                selectedModel = validModels[0].name;
-            } else {
-                const anyModel = modelsData.models.find(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent'));
-                if (anyModel) selectedModel = anyModel.name;
-            }
-        }
-
-        // 2. ОТПРАВКА ФОТО В НАЙДЕННУЮ МОДЕЛЬ
         const payload = {
             contents: [{
                 parts: [
@@ -47,7 +25,8 @@ export default async function handler(req, res) {
             generationConfig: { responseMimeType: "application/json" }
         };
 
-        const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/${selectedModel}:generateContent?key=${apiKey}`, {
+        // Стучимся ровно в ту версию нейросети, которую потребовал Google (gemini-3.8-flash)
+        const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -61,11 +40,10 @@ export default async function handler(req, res) {
         const result = await googleRes.json();
         let textResponse = result.candidates[0].content.parts[0].text;
         
-        // Очищаем от Markdown (```json ... ```)
+        // Очищаем от Markdown
         textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
         const aiData = JSON.parse(textResponse);
 
-        // Отправляем результат обратно в интерфейс
         return res.status(200).json(aiData);
 
     } catch (error) {
