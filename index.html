@@ -2,34 +2,186 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Диагностика API</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>DDX Pro Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { brand: '#39FF14', bgBase: '#050505', bgCard: '#121212', bgInput: '#1e1e1e', borderSubtle: '#2a2a2a' } } } }
+    </script>
+    <style>
+        body { background-color: #050505; color: #ffffff; overscroll-behavior-y: none; font-family: 'Inter', sans-serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .camera-frame::before, .camera-frame::after, .camera-frame-inner::before, .camera-frame-inner::after {
+            content: ''; position: absolute; width: 30px; height: 30px; border-color: #39FF14; border-style: solid;
+        }
+        .camera-frame::before { top: 0; left: 0; border-width: 3px 0 0 3px; border-top-left-radius: 12px; }
+        .camera-frame::after { top: 0; right: 0; border-width: 3px 3px 0 0; border-top-right-radius: 12px; }
+        .camera-frame-inner::before { bottom: 0; left: 0; border-width: 0 0 3px 3px; border-bottom-left-radius: 12px; }
+        .camera-frame-inner::after { bottom: 0; right: 0; border-width: 0 3px 3px 0; border-bottom-right-radius: 12px; }
+    </style>
 </head>
-<body style="background:#121212; color:#39FF14; font-family:monospace; padding:20px; font-size:14px; word-break: break-all;">
-    <h2>Диагностика Gemini API...</h2>
-    <div id="output">Ждем ответа от Google...</div>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <header class="bg-bgCard border-b border-borderSubtle py-4 px-6 flex justify-between items-center z-20 shrink-0">
+        <div><h1 class="text-2xl font-black tracking-tight uppercase">DDX <span class="text-brand">Hub</span></h1></div>
+        <div class="h-10 w-10 rounded-xl bg-bgInput flex items-center justify-center border border-borderSubtle"><i class="fa-solid fa-bolt text-brand"></i></div>
+    </header>
+
+    <main class="flex-grow overflow-y-auto no-scrollbar bg-bgBase p-4 pb-28" id="main-scroll">
+        <!-- СЕКЦИЯ СКАНЕРА -->
+        <section id="scanner" class="tab-content active">
+            <div class="mb-4">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-2">DDX Vision <span class="bg-brand text-black text-[9px] px-1.5 py-0.5 rounded font-black">AI Vercel</span></h2>
+                <p class="text-sm text-gray-400 mt-1">Определите КБЖУ еды (Работает без VPN).</p>
+            </div>
+
+            <div class="relative w-full h-80 bg-zinc-900 rounded-2xl overflow-hidden border border-borderSubtle flex flex-col items-center justify-center mb-6" id="camera-container">
+                <video id="camera-feed" class="absolute inset-0 w-full h-full object-cover hidden" autoplay playsinline></video>
+                <img id="preview-image" class="absolute inset-0 w-full h-full object-cover hidden" />
+                <canvas id="camera-canvas" class="hidden"></canvas>
+                
+                <div id="camera-status" class="z-10 flex flex-col items-center text-center p-4">
+                    <i class="fa-solid fa-camera text-4xl text-gray-500 mb-2"></i>
+                    <p class="text-sm text-gray-400" id="camera-status-text">Готов к работе</p>
+                    <label class="mt-4 bg-bgInput text-brand border border-brand/30 px-4 py-2 rounded-lg text-sm font-bold cursor-pointer">
+                        <i class="fa-solid fa-image mr-2"></i> Загрузить фото
+                        <input type="file" id="file-upload" accept="image/*" class="hidden" onchange="handleFileUpload(event)">
+                    </label>
+                </div>
+
+                <div class="camera-frame relative w-3/4 h-3/4 flex items-center justify-center z-10 pointer-events-none" id="focus-frame">
+                    <div class="camera-frame-inner absolute inset-0"></div>
+                </div>
+            </div>
+
+            <div id="ai-error-msg" class="hidden mb-4 bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-sm font-medium"></div>
+
+            <button id="btn-scan" onclick="captureAndAnalyze()" class="w-full bg-brand text-black font-black text-lg py-4 rounded-xl active:scale-95 transition">
+                <span id="btn-scan-text"><i class="fa-solid fa-expand"></i> АНАЛИЗИРОВАТЬ</span>
+            </button>
+
+            <!-- Результат -->
+            <div id="scan-result-card" class="mt-6 bg-bgCard rounded-2xl border border-brand/50 p-5 hidden">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-full bg-brand flex items-center justify-center text-black"><i class="fa-solid fa-check"></i></div>
+                    <div><h3 class="font-bold text-white text-lg">Распознано:</h3><p class="text-gray-300 text-sm" id="res-food-name">-</p></div>
+                </div>
+                <div class="grid grid-cols-4 gap-2 mt-4">
+                    <div class="col-span-4 bg-bgInput rounded-lg p-3 text-center border border-borderSubtle mb-1">
+                        <p class="text-[10px] text-gray-400 uppercase">Калории</p>
+                        <p class="text-2xl font-black text-white"><span id="res-food-cals">-</span> <span class="text-sm text-brand">ккал</span></p>
+                    </div>
+                    <div class="bg-blue-500/10 rounded border border-blue-500/30 p-2 text-center"><p class="text-[9px] text-blue-400">Белки</p><p class="font-bold"><span id="res-food-pro">-</span></p></div>
+                    <div class="bg-yellow-500/10 rounded border border-yellow-500/30 p-2 text-center"><p class="text-[9px] text-yellow-500">Жиры</p><p class="font-bold"><span id="res-food-fat">-</span></p></div>
+                    <div class="bg-brandLight rounded border border-brand/30 p-2 text-center col-span-2"><p class="text-[9px] text-brand">Углеводы</p><p class="font-bold"><span id="res-food-carb">-</span></p></div>
+                </div>
+                <button onclick="resetScanner()" class="w-full mt-4 bg-bgInput text-gray-300 font-medium py-3 rounded-lg hover:bg-zinc-800">Сбросить</button>
+            </div>
+        </section>
+    </main>
 
     <script>
-        async function runTest() {
-            const out = document.getElementById('output');
-            const key = "";
-            
+        let stream = null;
+        let currentImageBase64 = null;
+
+        // При загрузке страницы включаем камеру (если заходим с https или localhost)
+        window.onload = async function() {
             try {
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${key}`);
-                const text = await res.text();
-                
-                if (res.ok) {
-                    const data = JSON.parse(text);
-                    const models = data.models.map(m => m.name).join('<br> • ');
-                    out.innerHTML = `✅ <b>УСПЕХ. Доступные модели:</b><br> • ${models}`;
-                } else {
-                    out.innerHTML = `❌ <b>ОШИБКА СЕРВЕРА (Код ${res.status}):</b><br><br>${text}`;
-                }
-            } catch(e) {
-                out.innerHTML = `❌ <b>СЕТЕВАЯ ОШИБКА:</b><br>${e.message}<br>Убедитесь, что VPN включен.`;
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+                document.getElementById('camera-feed').srcObject = stream;
+                document.getElementById('camera-feed').classList.remove('hidden');
+                document.getElementById('camera-status').classList.add('hidden');
+            } catch (err) {
+                console.log("Камера недоступна:", err);
+            }
+        };
+
+        function stopCamera() {
+            if (stream) { stream.getTracks().forEach(track => track.stop()); stream = null; }
+            document.getElementById('camera-feed').classList.add('hidden');
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImageBase64 = e.target.result;
+                    document.getElementById('preview-image').src = currentImageBase64;
+                    document.getElementById('preview-image').classList.remove('hidden');
+                    document.getElementById('camera-status').classList.add('hidden');
+                    stopCamera();
+                };
+                reader.readAsDataURL(file);
             }
         }
-        runTest();
+
+        async function captureAndAnalyze() {
+            const video = document.getElementById('camera-feed');
+            const errorMsg = document.getElementById('ai-error-msg');
+            errorMsg.classList.add('hidden');
+
+            // Захватываем кадр, если загруженного фото нет, но камера работает
+            if (!currentImageBase64 && stream) {
+                const canvas = document.getElementById('camera-canvas');
+                canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+                currentImageBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                document.getElementById('preview-image').src = currentImageBase64;
+                document.getElementById('preview-image').classList.remove('hidden');
+                stopCamera();
+            }
+
+            if (!currentImageBase64) {
+                errorMsg.innerText = "Загрузите фото перед анализом.";
+                errorMsg.classList.remove('hidden');
+                return;
+            }
+
+            document.getElementById('btn-scan-text').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ОТПРАВКА НА VERCEL...';
+
+            try {
+                const base64Data = currentImageBase64.split(',')[1];
+                
+                // ВАЖНО: Мы стучимся на НАШ серверный файл scan.js, а не в Google!
+                const response = await fetch('/api/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ imageBase64: base64Data })
+                });
+
+                const result = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(result.error || 'Неизвестная ошибка сервера Vercel');
+                }
+
+                document.getElementById('res-food-name').innerText = result.foodName || "Неизвестно";
+                document.getElementById('res-food-cals').innerText = result.calories || 0;
+                document.getElementById('res-food-pro').innerText = result.protein || 0;
+                document.getElementById('res-food-fat').innerText = result.fat || 0;
+                document.getElementById('res-food-carb').innerText = result.carbs || 0;
+
+                document.getElementById('scan-result-card').classList.remove('hidden');
+                document.getElementById('btn-scan').classList.add('hidden');
+
+            } catch (error) {
+                console.error(error);
+                errorMsg.innerHTML = "<strong>Ошибка:</strong> " + error.message;
+                errorMsg.classList.remove('hidden');
+            } finally {
+                document.getElementById('btn-scan-text').innerHTML = '<i class="fa-solid fa-expand"></i> АНАЛИЗИРОВАТЬ';
+            }
+        }
+
+        function resetScanner() {
+            location.reload(); // Простой способ сбросить всё и заново включить камеру
+        }
     </script>
 </body>
 </html>
