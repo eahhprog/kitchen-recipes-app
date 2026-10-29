@@ -1,3 +1,5 @@
+export const maxDuration = 60; // Разрешаем Vercel ждать ответа до 60 секунд
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Метод не разрешен' });
@@ -9,9 +11,8 @@ export default async function handler(req, res) {
     }
 
     const apiKey = process.env.GEMINI_API_KEY; 
-
     if (!apiKey) {
-        return res.status(500).json({ error: 'API-ключ не настроен на сервере Vercel' });
+        return res.status(500).json({ error: 'API-ключ не настроен на Vercel' });
     }
 
     try {
@@ -25,8 +26,8 @@ export default async function handler(req, res) {
             generationConfig: { responseMimeType: "application/json" }
         };
 
-        // Стучимся ровно в ту версию нейросети, которую потребовал Google (gemini-3.8-flash)
-        const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+        // Используем самую быструю официальную модель 1.5-flash
+        const googleRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
@@ -34,13 +35,17 @@ export default async function handler(req, res) {
 
         if (!googleRes.ok) {
             const errData = await googleRes.json().catch(() => null);
-            throw new Error((errData && errData.error && errData.error.message) ? errData.error.message : 'Ошибка API Google');
+            const errMsg = (errData && errData.error && errData.error.message) ? errData.error.message : 'Ошибка API Google';
+            if (googleRes.status === 503 || googleRes.status === 429) {
+                throw new Error("Серверы Google сейчас перегружены. Попробуйте через пару минут.");
+            }
+            throw new Error(errMsg);
         }
 
         const result = await googleRes.json();
         let textResponse = result.candidates[0].content.parts[0].text;
         
-        // Очищаем от Markdown
+        // Очищаем от Markdown тегов
         textResponse = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
         const aiData = JSON.parse(textResponse);
 
